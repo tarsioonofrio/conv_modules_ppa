@@ -54,6 +54,7 @@ begin
             write(store_file, integer'image(CONV_INTEGER(pixel)));
             write(store_file, " ");
             if CONV_INTEGER(pixel) /= gold(conv_length) then
+               report "index : " & integer'image(conv_length);
                report "gold  == " & integer'image(gold(conv_length));
                report "pixel == " & integer'image(CONV_INTEGER(pixel));
                report "end of simulation with error!" severity failure;
