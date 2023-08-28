@@ -147,7 +147,7 @@ begin
              -- column control
              if (EA_add = ENDIDLE and fim_op = '1') then
                count_column <= count_column + 1;
-               if (count_column = 1) then
+               if (count_column = 2) then
                   count_convolutions <= count_convolutions + 1;
                   count_column <= (others=>'0');
                end if;
@@ -176,7 +176,7 @@ begin
                                  addressX <= x + X_SIZE;
                                  
                 when END2    =>  PE_add <= ENDIDLE;
-                                 addressX <= x + 1*X_SIZE;
+                                 addressX <= x + 2*X_SIZE;
                                  
                                  -- internal reset to control accumulation
                                  if (unsigned(count_convolutions) > 0 and count_column = 0) then
