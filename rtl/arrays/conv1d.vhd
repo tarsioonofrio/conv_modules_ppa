@@ -156,7 +156,7 @@ begin
           end if;
     end process;
 
-    process (EA_add,start_line, fim_op, count_convolutions)
+    process (reset, clock)
     begin
             internal_reset <= '0';
             
