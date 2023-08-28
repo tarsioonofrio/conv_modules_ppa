@@ -6,7 +6,7 @@ filter_channel   = [16,8,3,1]
 filter_dimension = [3,3,3,3]
 stride_h         = [2,1,2,1]
 stride_w         = [2,1,2,1]
-n_epochs         = 10
+n_epochs         = 50
 
 # HW Inputs
 MEM_SIZE     = 10 
