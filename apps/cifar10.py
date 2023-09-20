@@ -2,10 +2,10 @@ from imports import tensorflow
 from imports import lib
 
 # CNN Inputs
-filter_channel   = [16,32,64,128]
-filter_dimension = [3,3,3,3]
-stride_h         = [1,1,2,1]
-stride_w         = [1,1,2,1]
+filter_channel   = [16,32,64]
+filter_dimension = [3,3,3]
+stride_h         = [1,1,1]
+stride_w         = [1,1,1]
 n_epochs         = 50
 
 # HW Inputs
@@ -28,7 +28,7 @@ x_train,y_train,x_test,y_test,featureShape = tensorflow.get_cifar10_dataset(inpu
 
 # Build CNN application
 model = tensorflow.build_neural_network(featureShape, filter_channel, filter_dimension, stride_h, stride_w, input_h, input_w, input_c, n_conv_layers, n_dense_neuron)
-tensorflow.training_neural_network(model, x_train, y_train, n_epochs)
+tensorflow.training_neural_network(model, x_train, y_train, (x_test, y_test), n_epochs)
 
 # Compute input size
 input_size = lib.get_input_size(input_h, input_w, input_c)

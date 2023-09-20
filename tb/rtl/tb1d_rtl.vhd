@@ -52,7 +52,7 @@ begin
       if clock'event and clock = '0' then
          if valid = '1' and conv_length < CONVS_PER_LINE*CONVS_PER_LINE then
             write(store_file, integer'image(CONV_INTEGER(pixel)));
-            write(store_file, " ");
+            write(store_file, ", ");
             if CONV_INTEGER(pixel) /= gold(conv_length) then
                report "index : " & integer'image(conv_length);
                report "gold  == " & integer'image(gold(conv_length));

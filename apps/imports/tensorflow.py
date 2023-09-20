@@ -76,7 +76,7 @@ def build_neural_network(featureShape, filter_channel, filter_dimension, stride_
    return model
 
 
-def training_neural_network(model, x_train, y_train, n_epochs):
+def training_neural_network(model, x_train, y_train, validation_data, n_epochs):
    # Training
-   history = model.fit(x_train, y_train, epochs=n_epochs)
+   history = model.fit(x_train, y_train, validation_data=validation_data, epochs=n_epochs)
 

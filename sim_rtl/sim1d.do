@@ -9,10 +9,11 @@ vcom -work work ../rtl/arrays/conv1d.vhd
 vcom -work work ../tb/rtl/tb1d_rtl.vhd
 
 vsim -voptargs=+acc=lprn -t ns work.tb -f ../apps/stride2/generic_file.txt
+log -r /*
 
 do wave1d.do
-onfinish exit
-onbreak exit
+#onfinish exit
+#onbreak exit
 run -all
 exit
 
