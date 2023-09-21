@@ -32,7 +32,8 @@ end entity systolic2d;
 
 architecture a1 of systolic2d is
 
-  type statesM is (RIDLE, UPDATEADD, E0, E1, E2, E3, E4, E5);
+  --type statesM is (RIDLE, UPDATEADD, E0, E1, E2, E3, E4, E5);
+  type statesM is (RIDLE, UPDATEADD, E0, E1, E2);
   signal EA_add, PE_add : statesM;
 
   signal en_reg, pipe_reset : std_logic;
@@ -42,7 +43,11 @@ architecture a1 of systolic2d is
   signal weight : wgh3x3;
 
   type features_3x3 is array (0 to 2, 0 to 2) of std_logic_vector(7 downto 0);
-  signal features, buffer_features : features_3x3;
+  signal features: features_3x3;
+
+  type features_3 is array (0 to 2) of std_logic_vector(7 downto 0);
+  signal buffer_features : features_3;
+
 
   -- signals for the systolic2d 
   type array3x3 is array (0 to 2, 0 to 2) of std_logic_vector(19 downto 0);  -- 20 bits
@@ -164,10 +169,7 @@ begin
       when UPDATEADD => PE_add <= E0;  -- read 6 values from the memory **** continously ****
       when E0        => PE_add <= E1;
       when E1        => PE_add <= E2;
-      when E2        => PE_add <= E3;
-      when E3        => PE_add <= E4;
-      when E4        => PE_add <= E5;
-      when E5        => PE_add <= UPDATEADD;
+      when E2        => PE_add <= UPDATEADD;
     end case;
   end process;
 
@@ -177,10 +179,7 @@ begin
                  weight_x when weight_en = '1' else
                  add(0)   when EA_add = E0 else
                  add(1)   when EA_add = E1 else
-                 add(2)   when EA_add = E2 else
-                 add(3)   when EA_add = E3 else
-                 add(4)   when EA_add = E4 else
-                 add(5);
+                 add(2);
 
   -- read from memory filling the features matriz, the first cycle update the addresses
   process(reset, clock)
@@ -189,7 +188,7 @@ begin
       H               <= 0;
       V               <= 0;
       add             <= (others => (others => '0'));
-      buffer_features <= (others => (others => (others => '0')));
+      buffer_features <= (others => (others => '0'));
       features        <= (others => (others => (others => '0')));
       cont_steps      <= (others => '0');
 
@@ -201,51 +200,51 @@ begin
           -- UPDATE THE ADDRESS IN A PIPELINE FASHION (only 2 colums)
           --
           add(0) <= CONV_STD_LOGIC_VECTOR(V + H, 10);
-          add(1) <= add(0) + 1;
+          --add(1) <= add(0) + 1;
 
-          add(2) <= X_SIZE + add(0);
-          add(3) <= add(2) + 1;
+          add(1) <= X_SIZE + add(0);
+          --add(3) <= add(2) + 1;
 
-          add(4) <= X_SIZE + add(2);
-          add(5) <= add(4) + 1;
+          add(2) <= X_SIZE + add(1);
+          --add(5) <= add(4) + 1;
 
           --
           -- NEXT LINE
           --  
-          if (H+2) >= X_SIZE then
+          if (H+1) >= X_SIZE then
             H <= 0;
-            V <= V+2*X_SIZE;
+            V <= V+1*X_SIZE;
           else
-            H <= H+2;
+            H <= H+1;
           end if;
 
           --
           -- TRANSFER THE READ DATA, REUSING THE FIRST COLUM TO THE THIRD ONE
           --
-          features(0, 0) <= buffer_features(0, 0);
-          features(0, 1) <= buffer_features(0, 1);
-          features(0, 2) <= features(0, 0);
+          features(0, 0) <= buffer_features(0);
+          features(0, 1) <= buffer_features(0);
+          features(0, 2) <= buffer_features(0);
 
-          features(1, 0) <= buffer_features(1, 0);
-          features(1, 1) <= buffer_features(1, 1);
-          features(1, 2) <= features(1, 0);
+          features(1, 0) <= buffer_features(1);
+          features(1, 1) <= buffer_features(1);
+          features(1, 2) <= buffer_features(1);
 
 
-          features(2, 0) <= buffer_features(2, 0);
-          features(2, 1) <= buffer_features(2, 1);
-          features(2, 2) <= features(2, 0);
+          features(2, 0) <= buffer_features(2);
+          features(2, 1) <= buffer_features(2);
+          features(2, 2) <= buffer_features(2);
 
           -- count the number os arithmetic shifts
           if cont_steps < 7 then  -- stop at 7 - enough to fire accumulation
             cont_steps <= cont_steps + 1;
           end if;
 
-        when E0 => buffer_features(0, 0) <= data_from_mem;  --------- COMPUTE WITH PREVIOUS DATA
-        when E1 => buffer_features(0, 1) <= data_from_mem;
-        when E2 => buffer_features(1, 0) <= data_from_mem;
-        when E3 => buffer_features(1, 1) <= data_from_mem;
-        when E4 => buffer_features(2, 0) <= data_from_mem;  -- signalize to store in regs  
-        when E5 => buffer_features(2, 1) <= data_from_mem;
+        when E0 => buffer_features(0) <= data_from_mem;  --------- COMPUTE WITH PREVIOUS DATA
+        when E1 => buffer_features(1) <= data_from_mem;
+        when E2 => buffer_features(2) <= data_from_mem;
+        --when E3 => buffer_features(1) <= data_from_mem;
+        --when E4 => buffer_features(2) <= data_from_mem;  -- signalize to store in regs  
+        --when E5 => buffer_features(2) <= data_from_mem;
 
         when others => null;
       end case;
@@ -253,7 +252,7 @@ begin
     end if;
   end process;
 
-  en_reg <= '1' when EA_add = E4 else '0';  -- two clock cycles to execute the MAC
+  en_reg <= '1' when EA_add = E0 else '0';  -- two clock cycles to execute the MAC
 
   -------------------------------------------------------------------------------------------------------
   --- PART 2 *********  MACS AND FLOPS ARRAY - ATTENTION :  ARRANGEMENT IS DIFFERENT FROM 2D  ***********
@@ -314,11 +313,15 @@ begin
   end process;
 
   -- Shift
-  shift_output(19 downto 16) <= (others => '0');
+  --shift_output(19 downto 16) <= (others => '0');
 
   -- ReLU 
-  shift_output(15 downto 0) <= reg_soma3(19 downto 4) when reg_soma3 > 0 else
-                               (others => '0');
+  --shift_output(15 downto 0) <= reg_soma3(19 downto 4) when reg_soma3 > 0 else
+  --                             (others => '0');
+
+  shift_output <= reg_soma3 when reg_soma3 > 0 else
+                  (others => '0');
+
 
   -- Final output
   pixel <= shift_output;
@@ -328,9 +331,9 @@ begin
     if reset = '1' then
       cont_iterations <= (others => '0');
     elsif rising_edge(clock) then
-      if cont_steps > 6 and EA_add = E3 then
+      if cont_steps > 6 and EA_add = E2 then
         cont_iterations <= cont_iterations + 1;
-        if cont_iterations = CONVS_PER_LINE then
+        if cont_iterations >= CONVS_PER_LINE then
           cont_iterations <= (others => '0');
         end if;
       end if;
