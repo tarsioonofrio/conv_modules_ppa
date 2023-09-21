@@ -36,7 +36,7 @@ architecture a1 of systolic2d is
   type statesM is (RIDLE, UPDATEADD, E0, E1, E2);
   signal EA_add, PE_add : statesM;
 
-  signal en_reg, pipe_reset : std_logic;
+  signal en_reg, pipe_reset, change_line: std_logic;
 
   ---- fixed weights ----
   type wgh3x3 is array (0 to 2, 0 to 2) of std_logic_vector(7 downto 0);
@@ -62,6 +62,8 @@ architecture a1 of systolic2d is
 
   signal H : integer range 0 to X_SIZE;
   signal V : integer range 0 to 1024;  --------------------------------------- melhorar
+
+  --signal change_line : integer range 0 to 2;  --------------------------------------- melhorar
 
   -- signals for bias and weights control
   signal weight_x, bias_x : std_logic_vector(9 downto 0);
@@ -330,11 +332,19 @@ begin
   begin
     if reset = '1' then
       cont_iterations <= (others => '0');
+      change_line <= '0';
     elsif rising_edge(clock) then
-      if cont_steps > 6 and EA_add = E2 then
-        cont_iterations <= cont_iterations + 1;
-        if cont_iterations >= CONVS_PER_LINE then
-          cont_iterations <= (others => '0');
+      if EA_add = E2 then
+        if change_line = '0' then
+          if cont_steps > 6  then
+            cont_iterations <= cont_iterations + 1;
+            if cont_iterations >= CONVS_PER_LINE then
+                change_line <= '1';
+                cont_iterations <= (others => '0');
+            end if;
+          end if;
+        else
+          change_line <= '0';
         end if;
       end if;
     end if;

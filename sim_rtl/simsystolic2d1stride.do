@@ -12,6 +12,7 @@ log -r /*
 do wavesystolic2d.do
 add wave sim:/tb/DUT/en_reg
 add wave sim:/tb/DUT/cont_iterations
+add wave sim:/tb/DUT/change_line
 #onfinish exit
 #onbreak exit
 run -all
