@@ -202,20 +202,14 @@ begin
           -- UPDATE THE ADDRESS IN A PIPELINE FASHION (only 2 colums)
           --
           add(0) <= CONV_STD_LOGIC_VECTOR(V + H, 10);
-          --add(1) <= add(0) + 1;
-
           add(1) <= X_SIZE + add(0);
-          --add(3) <= add(2) + 1;
-
           add(2) <= X_SIZE + add(1);
-          --add(5) <= add(4) + 1;
-
           --
           -- NEXT LINE
           --  
           if (H+1) >= X_SIZE then
             H <= 0;
-            V <= V+1*X_SIZE;
+            V <= V+X_SIZE;
           else
             H <= H+1;
           end if;
@@ -240,14 +234,9 @@ begin
           if cont_steps < 7 then  -- stop at 7 - enough to fire accumulation
             cont_steps <= cont_steps + 1;
           end if;
-
         when E0 => buffer_features(0) <= data_from_mem;  --------- COMPUTE WITH PREVIOUS DATA
         when E1 => buffer_features(1) <= data_from_mem;
         when E2 => buffer_features(2) <= data_from_mem;
-        --when E3 => buffer_features(1) <= data_from_mem;
-        --when E4 => buffer_features(2) <= data_from_mem;  -- signalize to store in regs  
-        --when E5 => buffer_features(2) <= data_from_mem;
-
         when others => null;
       end case;
 

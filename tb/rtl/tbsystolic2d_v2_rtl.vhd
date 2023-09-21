@@ -6,13 +6,14 @@ use std.textio.all;
 use ieee.std_logic_textio.all;
 
 entity tb is
-  generic (X_SIZE         : integer := 5;
-           FILTER_WIDTH   : integer := 3;
-           CONVS_PER_LINE : integer := 3;
-           MEM_SIZE       : integer := 10;
-           INPUT_SIZE     : integer := 8;
-           CARRY_SIZE     : integer := 4
-           );
+  generic (
+    X_SIZE         : integer := 5;
+    FILTER_WIDTH   : integer := 3;
+    CONVS_PER_LINE : integer := 3;
+    MEM_SIZE       : integer := 10;
+    INPUT_SIZE     : integer := 8;
+    CARRY_SIZE     : integer := 4
+  );
 end tb;
 
 architecture a1 of tb is
@@ -89,7 +90,7 @@ begin
         if CONV_INTEGER(pixel) /= gold(conv_length) then
           report "gold  == " & integer'image(gold(conv_length));
           report "pixel == " & integer'image(CONV_INTEGER(pixel));
-          --report "end of simulation with error!" severity failure;
+          report "end of simulation with error!" severity failure;
           report "end of simulation with error!";
         end if;
         conv_length := conv_length + 1;
