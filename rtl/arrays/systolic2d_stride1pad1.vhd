@@ -61,8 +61,8 @@ architecture a1 of systolic2d is
 
   signal cont_steps : std_logic_vector(4 downto 0);
 
-  signal H : integer range 0 - 1 to X_SIZE + 1;
-  signal V : integer range -X_SIZE to 1024 + X_SIZE;  --------------------------------------- melhorar
+  signal H : integer range -1 to X_SIZE + 1;
+  signal V : integer range -X_SIZE to X_SIZE + 1024;  --------------------------------------- melhorar
 
   --signal change_line : integer range 0 to 2;  --------------------------------------- melhorar
 
@@ -181,20 +181,21 @@ begin
   address_out <= bias_x when bias_en = '1' else
                  weight_x when weight_en = '1' else
                  add(0)   when EA_add = E0 and pad(0) = '0' else
-                 add(1)   when EA_add = E1 and pad(0) = '0' else
-                 add(2)   when EA_add = E1 and pad(0) = '0' else
-                 0;
+                 add(1)   when EA_add = E1 and pad(1) = '0' else
+                 add(2)   when EA_add = E1 and pad(2) = '0' else
+                 (others => '0');
 
   -- read from memory filling the features matriz, the first cycle update the addresses
   process(reset, clock)
   begin
     if reset = '1' then
       H               <= -1;
-      V               <= - X_SIZE;
+      V               <= -X_SIZE;
       add             <= (others => (others => '0'));
       buffer_features <= (others => (others => '0'));
       features        <= (others => (others => (others => '0')));
       cont_steps      <= (others => '0');
+      pad             <= (others => '1');
 
     elsif rising_edge(clock) then
       case EA_add is
