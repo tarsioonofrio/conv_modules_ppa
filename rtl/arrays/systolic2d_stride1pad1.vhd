@@ -214,7 +214,7 @@ begin
           --
           -- NEXT LINE
           -- 
-          if V <= 0 then
+          if V < 0 then
             padv(0) <= '1';
             padv(1) <= '0';
             padv(2) <= '0';
@@ -235,13 +235,13 @@ begin
               H <= H+1;
               padh(0) <= '0';
             end if;
-          elsif H >= X_SIZE then
+          elsif H = X_SIZE then
             if padh(0) = '0' then
               padh(0) <= '1';
             else
               H <=0;
               V <= V+X_SIZE;
-              padh(0) <= '0';
+              --padh(0) <= '0';
             end if;
           else
             H <= H+1; 
