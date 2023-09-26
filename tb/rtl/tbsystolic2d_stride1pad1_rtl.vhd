@@ -94,7 +94,7 @@ begin
           report "end of simulation with error!";
         end if;
         conv_length := conv_length + 1;
-      elsif conv_length = CONVS_PER_LINE*2 then
+      elsif conv_length = CONVS_PER_LINE*3 then
         writeline(store_file, file_line);
         report "end of simulation without error!" severity failure;
       end if;

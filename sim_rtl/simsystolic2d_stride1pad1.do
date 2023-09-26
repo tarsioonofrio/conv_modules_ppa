@@ -15,7 +15,7 @@ add wave sim:/tb/DUT/cont_iterations
 add wave sim:/tb/DUT/change_line
 add wave sim:/tb/DUT/padh
 add wave sim:/tb/DUT/padv
-add wave sim:/tb/DUT/pad_delay
+add wave sim:/tb/DUT/data_from_mem
 #onfinish exit
 #onbreak exit
 run -all

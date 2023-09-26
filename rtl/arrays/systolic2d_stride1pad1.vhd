@@ -184,8 +184,7 @@ begin
                  weight_x when weight_en = '1' else
                  add(0)   when EA_add = E0 else
                  add(1)   when EA_add = E1 else
-                 add(2)   when EA_add = E1 else
-                 (others => '0');
+                 add(2);
 
   -- read from memory filling the features matriz, the first cycle update the addresses
   process(reset, clock)
@@ -215,12 +214,18 @@ begin
           --
           -- NEXT LINE
           -- 
-          if V = 0 then
+          if V <= 0 then
             padv(0) <= '1';
-          elsif V +1 = X_SIZE * X_SIZE then
+            padv(1) <= '0';
+            padv(2) <= '0';
+          elsif V >= X_SIZE * X_SIZE then
+            padv(0) <= '0';
+            padv(1) <= '0';
             padv(2) <= '1';
           else
+            padv(0) <= '0';
             padv(1) <= '0';
+            padv(2) <= '0';
           end if;
 
           if H = 0 then
@@ -244,11 +249,6 @@ begin
 
           padh(1) <= padh(0);
           padh(2) <= padh(1);
-
-
-          pad_delay(0) <= padh(0) or padv(0);
-          pad_delay(1) <= padh(1) or padv(1);
-          pad_delay(2) <= padh(2) or padv(2);
 
           --
           -- TRANSFER THE READ DATA, REUSING THE FIRST COLUM TO THE THIRD ONE
