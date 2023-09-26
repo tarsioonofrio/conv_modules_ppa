@@ -84,7 +84,7 @@ begin
     variable conv_length : integer := 0;
   begin
     if clock'event and clock = '0' then
-      if valid = '1' and conv_length < CONVS_PER_LINE*2 then
+      if valid = '1' and conv_length < CONVS_PER_LINE*3 then
         write(store_file, integer'image(CONV_INTEGER(pixel)));
         write(store_file, " ");
         if CONV_INTEGER(pixel) /= gold(conv_length) then
