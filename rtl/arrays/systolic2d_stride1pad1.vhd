@@ -57,12 +57,14 @@ architecture a1 of systolic2d is
 
   type address is array (0 to 5) of std_logic_vector(9 downto 0);
   signal add : address;
-  signal pad : std_logic_vector(2 downto 0);
+  signal padh : std_logic_vector(0 to 2);
+  signal padv : std_logic_vector(0 to 2);
+  signal pad_delay : std_logic_vector(0 to 2);
 
   signal cont_steps : std_logic_vector(4 downto 0);
 
-  signal H : integer range -1 to X_SIZE + 1;
-  signal V : integer range -X_SIZE to X_SIZE + 1024;  --------------------------------------- melhorar
+  signal H : integer range 0 to X_SIZE;
+  signal V : integer range -X_SIZE to 1024 + X_SIZE;  --------------------------------------- melhorar
 
   --signal change_line : integer range 0 to 2;  --------------------------------------- melhorar
 
@@ -180,22 +182,24 @@ begin
 
   address_out <= bias_x when bias_en = '1' else
                  weight_x when weight_en = '1' else
-                 add(0)   when EA_add = E0 and pad(0) = '0' else
-                 add(1)   when EA_add = E1 and pad(1) = '0' else
-                 add(2)   when EA_add = E1 and pad(2) = '0' else
+                 add(0)   when EA_add = E0 else
+                 add(1)   when EA_add = E1 else
+                 add(2)   when EA_add = E1 else
                  (others => '0');
 
   -- read from memory filling the features matriz, the first cycle update the addresses
   process(reset, clock)
   begin
     if reset = '1' then
-      H               <= -1;
+      H               <= 0;
       V               <= -X_SIZE;
       add             <= (others => (others => '0'));
       buffer_features <= (others => (others => '0'));
       features        <= (others => (others => (others => '0')));
       cont_steps      <= (others => '0');
-      pad             <= (others => '1');
+      padh            <= (others => '1');
+      padv            <= (others => '1');
+      pad_delay       <= (others => '0');
 
     elsif rising_edge(clock) then
       case EA_add is
@@ -210,23 +214,41 @@ begin
 
           --
           -- NEXT LINE
-          --  
-          if H = -1 then
-            H <= H+1;
-            V <= V+X_SIZE;
-            pad(0) <= '1';
-          elsif (H+1) >= X_SIZE + 1 then
-            H <=-1;
-            V <= V+X_SIZE;
-            pad(0) <= '1';
+          -- 
+          if V = 0 then
+            padv(0) <= '1';
+          elsif V +1 = X_SIZE * X_SIZE then
+            padv(2) <= '1';
           else
-            H <= H+1;
-            pad(0) <= '0';
+            padv(1) <= '0';
           end if;
 
-          pad(1) <= pad(0);
-          pad(2) <= pad(1);
+          if H = 0 then
+            if padh(0) = '0' then
+              padh(0) <= '1';
+            else 
+              H <= H+1;
+              padh(0) <= '0';
+            end if;
+          elsif (H+1) >= X_SIZE then
+            if padh(0) = '0' then
+              padh(0) <= '1';
+            else
+              H <=0;
+              V <= V+X_SIZE;
+              padh(0) <= '0';
+            end if;
+          else
+            H <= H+1; 
+          end if;
 
+          padh(1) <= padh(0);
+          padh(2) <= padh(1);
+
+
+          pad_delay(0) <= padh(0) or padv(0);
+          pad_delay(1) <= padh(1) or padv(1);
+          pad_delay(2) <= padh(2) or padv(2);
 
           --
           -- TRANSFER THE READ DATA, REUSING THE FIRST COLUM TO THE THIRD ONE
@@ -249,19 +271,19 @@ begin
             cont_steps <= cont_steps + 1;
           end if;
         when E0 => 
-          if pad(0) = '0' then
+          if (padh(0) = '0' or padv(0) = '0')  then
             buffer_features(0) <= data_from_mem;  --------- COMPUTE WITH PREVIOUS DATA
           else
             buffer_features(0) <= (others => '0');
           end if;
         when E1 =>
-          if pad(1) = '0' then
+          if (padh(1) = '0' or padv(1) = '0')  then
             buffer_features(1) <= data_from_mem;  --------- COMPUTE WITH PREVIOUS DATA
           else
             buffer_features(1) <= (others => '0');
           end if;
         when E2 =>
-          if pad(2) = '0' then
+          if (padh(2) = '0' or padv(2) = '0')  then
             buffer_features(2) <= data_from_mem;  --------- COMPUTE WITH PREVIOUS DATA
           else
             buffer_features(2) <= (others => '0');
@@ -339,8 +361,7 @@ begin
   --shift_output(15 downto 0) <= reg_soma3(19 downto 4) when reg_soma3 > 0 else
   --                             (others => '0');
 
-  shift_output <= reg_soma3 when reg_soma3 > 0 else
-                  (others => '0');
+  shift_output <= reg_soma3;
 
 
   -- Final output

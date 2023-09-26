@@ -13,7 +13,9 @@ do wavesystolic2d.do
 add wave sim:/tb/DUT/en_reg
 add wave sim:/tb/DUT/cont_iterations
 add wave sim:/tb/DUT/change_line
-add wave sim:/tb/DUT/pad
+add wave sim:/tb/DUT/padh
+add wave sim:/tb/DUT/padv
+add wave sim:/tb/DUT/pad_delay
 #onfinish exit
 #onbreak exit
 run -all

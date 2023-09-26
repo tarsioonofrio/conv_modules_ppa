@@ -7,7 +7,7 @@ use ieee.std_logic_textio.all;
 
 entity tb is
   generic (
-    X_SIZE         : integer := 5;
+    X_SIZE         : integer := 3;
     FILTER_WIDTH   : integer := 3;
     CONVS_PER_LINE : integer := 3;
     MEM_SIZE       : integer := 10;
@@ -38,8 +38,8 @@ architecture a1 of tb is
                                      7, -9, 9,
                                      others => 0);
 
-  constant gold : padroes := (0, 0, 94,
-                              156, 0, 0,
+  constant gold : padroes := (-59, -78, 94,
+                              156, -139, -72,
                               -8, 102, 74,
                               others => 0);
 
