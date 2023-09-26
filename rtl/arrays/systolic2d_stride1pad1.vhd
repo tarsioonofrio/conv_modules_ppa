@@ -235,7 +235,7 @@ begin
               H <= H+1;
               padh(0) <= '0';
             end if;
-          elsif (H+1) >= X_SIZE then
+          elsif H >= X_SIZE then
             if padh(0) = '0' then
               padh(0) <= '1';
             else
