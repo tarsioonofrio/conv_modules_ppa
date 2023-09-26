@@ -196,7 +196,7 @@ begin
       buffer_features <= (others => (others => '0'));
       features        <= (others => (others => (others => '0')));
       cont_steps      <= (others => '0');
-      padh            <= (others => '1');
+      padh            <= (others => '0');
       padv            <= (others => '1');
       pad_delay       <= (others => '0');
 
@@ -271,22 +271,22 @@ begin
             cont_steps <= cont_steps + 1;
           end if;
         when E0 => 
-          if (padh(0) = '0' or padv(0) = '0')  then
-            buffer_features(0) <= data_from_mem;  --------- COMPUTE WITH PREVIOUS DATA
-          else
+          if (padh(0) = '1' or padv(0) = '1')  then
             buffer_features(0) <= (others => '0');
+          else
+            buffer_features(0) <= data_from_mem;  --------- COMPUTE WITH PREVIOUS DATA
           end if;
         when E1 =>
-          if (padh(1) = '0' or padv(1) = '0')  then
-            buffer_features(1) <= data_from_mem;  --------- COMPUTE WITH PREVIOUS DATA
-          else
+          if (padh(1) = '1' or padv(1) = '1')  then
             buffer_features(1) <= (others => '0');
+          else
+            buffer_features(1) <= data_from_mem;  --------- COMPUTE WITH PREVIOUS DATA
           end if;
         when E2 =>
-          if (padh(2) = '0' or padv(2) = '0')  then
-            buffer_features(2) <= data_from_mem;  --------- COMPUTE WITH PREVIOUS DATA
-          else
+          if (padh(2) = '1' or padv(2) = '1')  then
             buffer_features(2) <= (others => '0');
+          else
+            buffer_features(2) <= data_from_mem;  --------- COMPUTE WITH PREVIOUS DATA
           end if;
         when others => null;
       end case;
