@@ -29,9 +29,10 @@ architecture a1 of tb is
   constant bias_mem : padroes := (0, others => 0);
 
   constant weight_mem : padroes := (
-    8, 4, 8,
-    -2, -4, 4,
-    5, 3, -7,
+    2048,  1024,  2048,
+    -512, -1024,  1024,
+    1280,  768, -1792,
+
     others => 0
   );
 
@@ -40,14 +41,13 @@ architecture a1 of tb is
     -4, 9, 5, -2, 4,
     7, -9, 9, -3, 11,
     1, 2, 3, 4, 5,
-    1, 2, 3, 4, 5,
     others => 0
   );
 
   constant gold : padroes := (
-    0, 5, 0,
-    92, 37, 94,
-    84, 0, 138,
+    0, 1280, 0,
+    23552, 9472, 24064,
+
     others => 0
   );
 
@@ -92,7 +92,7 @@ begin
     variable conv_length : integer := 0;
   begin
     if clock'event and clock = '0' then
-      if valid = '1' and conv_length < CONVS_PER_LINE*CONVS_PER_LINE then
+      if valid = '1' and conv_length < CONVS_PER_LINE*2 then
         write(store_file, integer'image(CONV_INTEGER(pixel)));
         write(store_file, " ");
         if CONV_INTEGER(pixel) /= gold(conv_length) then
@@ -102,7 +102,7 @@ begin
           report "end of simulation with error!";
         end if;
         conv_length := conv_length + 1;
-      elsif conv_length = CONVS_PER_LINE*CONVS_PER_LINE then
+      elsif conv_length = CONVS_PER_LINE*2 then
         writeline(store_file, file_line);
         report "end of simulation without error!" severity failure;
       end if;
