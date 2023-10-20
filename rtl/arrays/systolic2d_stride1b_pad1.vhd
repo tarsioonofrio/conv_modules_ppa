@@ -59,7 +59,6 @@ architecture a1 of systolic2d is
   signal add : address;
   signal padh : std_logic_vector(0 to 2);
   signal padv : std_logic_vector(0 to 2);
-  signal pad_delay : std_logic_vector(0 to 2);
 
   signal cont_steps : std_logic_vector(4 downto 0);
 
@@ -198,7 +197,6 @@ begin
       cont_steps      <= (others => '0');
       padh            <= (others => '0');
       padv            <= (others => '1');
-      pad_delay       <= (others => '0');
 
     elsif rising_edge(clock) then
       case EA_add is
@@ -270,6 +268,7 @@ begin
           if cont_steps < 7 then  -- stop at 7 - enough to fire accumulation
             cont_steps <= cont_steps + 1;
           end if;
+          
         when E0 => 
           if (padh(0) = '1' or padv(0) = '1')  then
             buffer_features(0) <= (others => '0');
@@ -361,8 +360,10 @@ begin
   --shift_output(15 downto 0) <= reg_soma3(19 downto 4) when reg_soma3 > 0 else
   --                             (others => '0');
 
-  shift_output <= reg_soma3;
+  --shift_output <= reg_soma3 when reg_soma3 > 0 else
+                  --(others => '0');
 
+  shift_output <= reg_soma3;
 
   -- Final output
   pixel <= shift_output;
@@ -371,25 +372,17 @@ begin
   begin
     if reset = '1' then
       cont_iterations <= (others => '0');
-      change_line <= '0';
     elsif rising_edge(clock) then
-      if EA_add = E2 then
-        if change_line = '0' then
-          if cont_steps > 6  then
-            cont_iterations <= cont_iterations + 1;
-            if cont_iterations >= CONVS_PER_LINE then
-                change_line <= '1';
-                cont_iterations <= (others => '0');
-            end if;
-          end if;
-        else
-          change_line <= '0';
+      if cont_steps > 5 and EA_add = E2 then
+        cont_iterations <= cont_iterations + 1;
+        if cont_iterations = CONVS_PER_LINE + 1 then
+          cont_iterations <= (others => '0');
         end if;
       end if;
     end if;
   end process;
 
-  valid <= '1' when EA_add = UPDATEADD and cont_iterations > 0 else
+  valid <= '1' when EA_add = UPDATEADD and (cont_iterations > 1) and (cont_iterations < CONVS_PER_LINE + 1 + 1)  else
            '0';
 end a1;
 

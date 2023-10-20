@@ -4,7 +4,7 @@ vmap work work
 
 vcom -work work ../rtl/components/reg.vhd
 vcom -work work ../rtl/components/mac.vhd
-vcom -work work ../rtl/arrays/systolic2d_stride1pad1.vhd
+vcom -work work ../rtl/arrays/systolic2d_stride1b_pad1.vhd
 vcom -work work ../tb/rtl/tbsystolic2d_stride1pad1_rtl.vhd
 
 vsim -voptargs=+acc=lprn -t ns work.tb 

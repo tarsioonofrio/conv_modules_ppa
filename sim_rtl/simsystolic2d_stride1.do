@@ -8,12 +8,15 @@ vcom -work work ../rtl/arrays/systolic2d_stride1b.vhd
 vcom -work work ../tb/rtl/tbsystolic2d_stride1_rtl.vhd
 
 vsim -voptargs=+acc=lprn -t ns work.tb 
+vcd file file.vcd
+vcd add -r *
+
 log -r /*
 do wavesystolic2d.do
 add wave sim:/tb/DUT/weight
 add wave sim:/tb/DUT/en_reg
 add wave sim:/tb/DUT/cont_iterations
-add wave sim:/tb/DUT/change_line
+add wave sim:/tb/DUT/add
 #onfinish exit
 #onbreak exit
 run -all
